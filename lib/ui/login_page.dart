@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:toko_kita/bloc/login_bloc.dart';
+import 'package:toko_kita/helpers/user_info.dart';
+import 'package:toko_kita/ui/produk_page.dart';
 import 'package:toko_kita/ui/registrasi_page.dart';
+import 'package:toko_kita/widget/warning_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,7 +14,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final bool _isLoading = false;
+  bool _isLoading = false;
 
   final _emailTextboxController = TextEditingController();
   final _passwordTextboxController = TextEditingController();
@@ -72,13 +76,49 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+// Widget to create the login button
   Widget _buttonLogin() {
     return ElevatedButton(
       child: const Text("Login"),
       onPressed: () {
         var validate = _formKey.currentState!.validate();
+        if (validate && !_isLoading) {
+          _submit();
+        }
       },
     );
+  }
+
+// Function to handle the login submission
+  void _submit() {
+    _formKey.currentState!.save();
+    setState(() {
+      _isLoading = true;
+    });
+
+    LoginBloc.login(
+      email: _emailTextboxController.text,
+      password: _passwordTextboxController.text,
+    ).then((value) async {
+      await UserInfo().setToken(value.token.toString());
+      await UserInfo().setUserID(int.parse(value.userID.toString()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProdukPage()),
+      );
+    }, onError: (error) {
+      print(error);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => const WarningDialog(
+          description: "Login gagal, silahkan coba lagi",
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Widget _menuRegistrasi() {
