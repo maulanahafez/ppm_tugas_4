@@ -9,7 +9,7 @@ class ProdukBloc {
     String apiUrl = ApiUrl.listProduk;
     var response = await Api().get(apiUrl);
     var jsonObj = json.decode(response.body);
-    List<dynamic> listProduk = jsonObj['data'];
+    List<dynamic> listProduk = (jsonObj as Map<String, dynamic>)['data'];
     List<Produk> produks = [];
     for (int i = 0; i < listProduk.length; i++) {
       produks.add(Produk.fromJson(listProduk[i]));
@@ -38,7 +38,7 @@ class ProdukBloc {
     };
     var response = await Api().post(apiUrl, body);
     var jsonObj = json.decode(response.body);
-    return jsonObj['data'];
+    return jsonObj['status'];
   }
 
   static Future<bool> deleteProduk(int? id) async {

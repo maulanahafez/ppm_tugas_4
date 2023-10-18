@@ -27,7 +27,7 @@ class Api {
     var responseJson;
     try {
       final response = await http.get(
-        url,
+        Uri.parse(url),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },
@@ -44,7 +44,7 @@ class Api {
     var responseJson;
     try {
       final response = await http.delete(
-        url,
+        Uri.parse(url),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },

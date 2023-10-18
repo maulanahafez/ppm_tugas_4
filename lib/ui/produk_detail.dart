@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:toko_kita/bloc/produk_bloc.dart';
 import 'package:toko_kita/model/produk.dart';
 import 'package:toko_kita/ui/produk_form.dart';
+import 'package:toko_kita/ui/produk_page.dart';
+import 'package:toko_kita/widget/warning_dialog.dart';
 
 class ProdukDetail extends StatefulWidget {
   Produk? produk;
@@ -69,10 +72,29 @@ class _ProdukDetailState extends State<ProdukDetail> {
     AlertDialog alertDialog = AlertDialog(
       content: const Text("Yakin ingin menghapus data ini?"),
       actions: [
+        // Tombol hapus
         OutlinedButton(
           child: const Text("Ya"),
-          onPressed: () {},
+          onPressed: () {
+            ProdukBloc.deleteProduk(widget.produk!.id).then((value) {
+              if (value) {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const ProdukPage(),
+                ));
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) => const WarningDialog(
+                    description: "Gagal menghapus data. Silakan coba lagi.",
+                  ),
+                );
+              }
+            }).catchError((error) {});
+
+            Navigator.pop(context);
+          },
         ),
+        // Tombol batal
         OutlinedButton(
           child: const Text("Batal"),
           onPressed: () => Navigator.pop(context),
